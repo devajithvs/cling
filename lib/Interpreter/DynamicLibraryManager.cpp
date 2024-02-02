@@ -328,7 +328,7 @@ namespace cling {
       foundName = lookupLibMaybeAddExt(libStem, RPath, RunPath, libLoader);
       if (foundName.empty()) {
         llvm::StringRef libStemName = llvm::sys::path::filename(libStem);
-        if (!libStemName.startswith("lib")) {
+        if (!libStemName.starts_with("lib")) {
           // try with "lib" prefix:
           foundName = lookupLibMaybeAddExt(
              libStem.str().insert(libStem.size()-libStemName.size(), "lib"),

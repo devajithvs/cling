@@ -386,7 +386,7 @@ void BackendPasses::CreatePasses(int OptLevel, llvm::ModulePassManager& MPM,
     });
   }
 
-  SI.registerCallbacks(PIC, &FAM);
+  SI.registerCallbacks(PIC, &MAM);
 
   PipelineTuningOptions PTO;
   std::optional<PGOOptions> PGOOpt;

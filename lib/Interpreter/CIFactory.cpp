@@ -1114,7 +1114,7 @@ namespace {
         }
 
         bool ReadPreprocessorOptions(const PreprocessorOptions &PPOpts,
-                                     bool /*Complain*/,
+                                     bool /*ReadMacros*/, bool /*Complain*/,
                                 std::string &/*SuggestedPredefines*/) override {
           Out.indent(2) << "Preprocessor options:\n";
           DUMP_BOOLEAN(PPOpts.UsePredefines,
@@ -1475,7 +1475,7 @@ namespace {
           bool ReadLanguageOptions(const LangOptions &LangOpts,
                                    bool /*Complain*/,
                                    bool /*AllowCompatibleDifferences*/) override {
-            *m_Invocation.getLangOpts() = LangOpts;
+            m_Invocation.getLangOpts() = LangOpts;
             m_ReadLang = true;
             return false;
           }
@@ -1487,7 +1487,7 @@ namespace {
             return false;
           }
           bool ReadPreprocessorOptions(const PreprocessorOptions &PPOpts,
-                                       bool /*Complain*/,
+                                       bool /*ReadMacros*/, bool /*Complain*/,
                                   std::string &/*SuggestedPredefines*/) override {
             // Import selected options, e.g. don't overwrite ImplicitPCHInclude.
             PreprocessorOptions& myPP = m_Invocation.getPreprocessorOpts();
@@ -1580,7 +1580,7 @@ namespace {
     MainFileCC.setBuffer(std::move(Buffer));
 
     // Create TargetInfo for the other side of CUDA and OpenMP compilation.
-    if ((CI->getLangOpts().CUDA || CI->getLangOpts().OpenMPIsDevice) &&
+    if ((CI->getLangOpts().CUDA || CI->getLangOpts().OpenMPIsTargetDevice) &&
         !CI->getFrontendOpts().AuxTriple.empty()) {
           auto TO = std::make_shared<TargetOptions>();
           TO->Triple = CI->getFrontendOpts().AuxTriple;

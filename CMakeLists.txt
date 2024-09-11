@@ -154,6 +154,7 @@ function(cling_add_cxx_flag var flag)
   endif()
 endfunction()
 
+append("-Werror" CMAKE_CXX_FLAGS)
 if(CLING_ENABLE_WARNINGS AND NOT LLVM_ENABLE_WARNINGS AND (LLVM_COMPILER_IS_GCC_COMPATIBLE OR CLANG_CL))
   # from HandleLLCMOptions.cmake:
   append("-Wall -W -Wno-unused-parameter -Wwrite-strings" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)

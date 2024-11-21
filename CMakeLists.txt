@@ -527,3 +527,45 @@ set(CLING_ORDER_FILE "" CACHE FILEPATH
   "Order file to use when compiling cling in order to improve startup time.")
 
 add_subdirectory(cmake/modules)
+
+if(adaptivecpp)
+  # Paths for AdaptiveCPP
+  set(ADAPTIVE_CPP_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/AdaptiveCpp")
+  set(ADAPTIVE_CPP_BUILD_DIR "${CMAKE_BINARY_DIR}/AdaptiveCppBuild")
+  set(ADAPTIVE_CPP_INSTALL_DIR "${CMAKE_BINARY_DIR}/AdaptiveCppInstall")
+  file(MAKE_DIRECTORY ${ADAPTIVE_CPP_BUILD_DIR})
+
+  # Custom target to configure AdaptiveCPP
+  add_custom_target(ConfigureAdaptiveCpp
+    COMMAND ${CMAKE_COMMAND} -G Ninja ${ADAPTIVE_CPP_SOURCE_DIR}
+      -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+      -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+      -DCLANG_EXECUTABLE_PATH=${CMAKE_BINARY_DIR}/bin/clang++
+      -DLLVM_DIR=${CMAKE_BINARY_DIR}/lib/cmake/llvm
+      -DCMAKE_BUILD_TYPE=Release
+      -DCMAKE_INSTALL_PREFIX=${ADAPTIVE_CPP_INSTALL_DIR}
+    WORKING_DIRECTORY ${ADAPTIVE_CPP_BUILD_DIR}
+    COMMENT "Configuring AdaptiveCPP in ${ADAPTIVE_CPP_BUILD_DIR}"
+  )
+
+  # Custom target to build AdaptiveCPP
+  add_custom_target(BuildAdaptiveCpp
+    COMMAND ${CMAKE_COMMAND} --build ${ADAPTIVE_CPP_BUILD_DIR}
+    WORKING_DIRECTORY ${ADAPTIVE_CPP_BUILD_DIR}
+    COMMENT "Building AdaptiveCPP in ${ADAPTIVE_CPP_BUILD_DIR}"
+  )
+
+  # Custom target to install AdaptiveCPP
+  add_custom_target(InstallAdaptiveCpp ALL
+    COMMAND ${CMAKE_COMMAND} --install ${ADAPTIVE_CPP_BUILD_DIR}
+    WORKING_DIRECTORY ${ADAPTIVE_CPP_BUILD_DIR}
+    COMMENT "Installing AdaptiveCPP to ${ADAPTIVE_CPP_INSTALL_DIR}"
+  )
+
+  # AdaptiveCpp depends on LLVM and clang being built
+  add_dependencies(ConfigureAdaptiveCpp clang llvm-config)
+  add_dependencies(BuildAdaptiveCpp ConfigureAdaptiveCpp)
+  add_dependencies(InstallAdaptiveCpp BuildAdaptiveCpp)
+
+  message(STATUS "AdaptiveCPP configuration, build, and install targets have been added.")
+endif()

@@ -529,11 +529,21 @@ set(CLING_ORDER_FILE "" CACHE FILEPATH
 add_subdirectory(cmake/modules)
 
 if(adaptivecpp)
+  add_definitions(-DADAPTIVECPP_ENABLED)
+
   # Paths for AdaptiveCPP
   set(ADAPTIVE_CPP_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/AdaptiveCpp")
   set(ADAPTIVE_CPP_BUILD_DIR "${CMAKE_BINARY_DIR}/AdaptiveCppBuild")
   set(ADAPTIVE_CPP_INSTALL_DIR "${CMAKE_BINARY_DIR}/AdaptiveCppInstall")
+  set(ADAPTIVE_CPP_BINARY "${ADAPTIVE_CPP_INSTALL_DIR}/bin/acpp")
   file(MAKE_DIRECTORY ${ADAPTIVE_CPP_BUILD_DIR})
+
+  # Configuration header file for AdaptiveCPP
+  configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/tools/plugins/AdaptiveCppConfig.h.in
+    ${CMAKE_BINARY_DIR}/include/AdaptiveCPP/AdaptiveCppConfig.h
+    @ONLY
+  )
 
   # Custom target to configure AdaptiveCPP
   add_custom_target(ConfigureAdaptiveCpp

@@ -531,6 +531,14 @@ add_subdirectory(cmake/modules)
 if(adaptivecpp)
   add_definitions(-DADAPTIVECPP_ENABLED)
 
+  if(DEFINED CLING_ROOT_BUILD)
+    set(CLANG_EXECUTABLE_PATH "${CMAKE_BINARY_DIR}/interpreter/llvm-project/llvm/bin/clang++")
+    set(LLVM_DIR "${CMAKE_BINARY_DIR}/interpreter/llvm-project/llvm/lib/cmake/llvm")
+  else()
+    set(CLANG_EXECUTABLE_PATH "${CMAKE_BINARY_DIR}/bin/clang++")
+    set(LLVM_DIR "${CMAKE_BINARY_DIR}/lib/cmake/llvm")
+  endif()
+
   # Paths for AdaptiveCPP
   set(ADAPTIVE_CPP_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/AdaptiveCpp")
   set(ADAPTIVE_CPP_BUILD_DIR "${CMAKE_BINARY_DIR}/AdaptiveCppBuild")
@@ -550,8 +558,8 @@ if(adaptivecpp)
     COMMAND ${CMAKE_COMMAND} -G Ninja ${ADAPTIVE_CPP_SOURCE_DIR}
       -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
       -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
-      -DCLANG_EXECUTABLE_PATH=${CMAKE_BINARY_DIR}/bin/clang++
-      -DLLVM_DIR=${CMAKE_BINARY_DIR}/lib/cmake/llvm
+      -DCLANG_EXECUTABLE_PATH=${CLANG_EXECUTABLE_PATH}
+      -DLLVM_DIR=${LLVM_DIR}
       -DCMAKE_BUILD_TYPE=Release
       -DCMAKE_INSTALL_PREFIX=${ADAPTIVE_CPP_INSTALL_DIR}
     WORKING_DIRECTORY ${ADAPTIVE_CPP_BUILD_DIR}

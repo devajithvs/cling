@@ -581,7 +581,7 @@ if(adaptivecpp)
   )
 
   # AdaptiveCpp depends on LLVM and clang being built
-  add_dependencies(ConfigureAdaptiveCpp clang llvm-config)
+  add_dependencies(ConfigureAdaptiveCpp clang llvm-config llvm-link)
   add_dependencies(BuildAdaptiveCpp ConfigureAdaptiveCpp)
   add_dependencies(InstallAdaptiveCpp BuildAdaptiveCpp)
 

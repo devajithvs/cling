@@ -574,7 +574,7 @@ if(adaptivecpp)
   )
 
   # Custom target to install AdaptiveCPP
-  add_custom_target(InstallAdaptiveCpp ALL
+  add_custom_target(InstallAdaptiveCpp
     COMMAND ${CMAKE_COMMAND} --install ${ADAPTIVE_CPP_BUILD_DIR}
     WORKING_DIRECTORY ${ADAPTIVE_CPP_BUILD_DIR}
     COMMENT "Installing AdaptiveCPP to ${ADAPTIVE_CPP_INSTALL_DIR}"
@@ -586,4 +586,6 @@ if(adaptivecpp)
   add_dependencies(InstallAdaptiveCpp BuildAdaptiveCpp)
 
   message(STATUS "AdaptiveCPP configuration, build, and install targets have been added.")
+
+  add_dependencies(cling InstallAdaptiveCpp)
 endif()

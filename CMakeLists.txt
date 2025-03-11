@@ -1,3 +1,11 @@
+include_directories(/home/dvalapar/work/xeus/cling-build/AdaptiveCppInstall/include)
+include_directories(/home/dvalapar/work/xeus/cling-build/AdaptiveCppInstall/include/AdaptiveCpp)
+include_directories(/home/dvalapar/work/xeus/cling-build/AdaptiveCppInstall/include/AdaptiveCpp/AdaptiveCpp/)
+
+add_subdirectory(/home/dvalapar/work/xeus/cling-static/adaptiveCpp/src/common)
+add_subdirectory(/home/dvalapar/work/xeus/cling-static/adaptiveCpp/src/compiler)
+add_subdirectory(/home/dvalapar/work/xeus/cling-static/adaptiveCpp/src/libkernel)
+add_subdirectory(/home/dvalapar/work/xeus/cling-static/adaptiveCpp/src/runtime)
 if(WIN32)
   # We need cmake to support exporting of symbols not only from libraries but
   # from executables too. This way cling can find symbols from its own
@@ -7,10 +15,6 @@ else(WIN32)
   # support of earlier cmake versions will be removed soon
   cmake_minimum_required(VERSION 3.5)
 endif(WIN32)
-
-if(adaptivecpp)
-  add_compile_definitions(ADAPTIVECPP_ENABLED)
-endif()
 
 # If we are not building as a part of LLVM, build Cling as an
 # standalone project, using LLVM as an external library:
@@ -247,8 +251,6 @@ if(MSVC)
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std:c++14")
     endif()
   endif()
-elseif(adaptivecpp)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 else()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
 endif()
@@ -363,7 +365,7 @@ macro(add_cling_library name)
   endif()
 
   # Set DISABLE_LLVM_LINK_LLVM_DYLIB to disable linking against shared LLVM
-  llvm_add_library(${name} ${ARG_ENABLE_SHARED} ${ARG_UNPARSED_ARGUMENTS} ${srcs})
+  llvm_add_library(${name} ${ARG_ENABLE_SHARED} DISABLE_LLVM_LINK_LLVM_DYLIB ${ARG_UNPARSED_ARGUMENTS} ${srcs})
 
   if (MSVC AND cling_ex_file_match)
     # /EHs because cling_runtime_internal_throwIfInvalidPointer is extern “C”
@@ -527,7 +529,3 @@ set(CLING_ORDER_FILE "" CACHE FILEPATH
   "Order file to use when compiling cling in order to improve startup time.")
 
 add_subdirectory(cmake/modules)
-
-if(adaptivecpp)
-  add_subdirectory(tools/plugins/adaptivecpp)
-endif()

@@ -584,9 +584,8 @@ namespace cling {
     //Successful = VisitRedeclarable(USD, USD->getDeclContext());
     Successful &= VisitNamedDecl(USD);
 
-    if (llvm::is_contained(USD->getIntroducer()->shadows(), USD))
-      // Unregister from the using decl that it shadows.
-      USD->getIntroducer()->removeShadowDecl(USD);
+    // Unregister from the using decl that it shadows.
+    USD->getIntroducer()->removeShadowDecl(USD);
 
     return Successful;
   }

@@ -29,7 +29,7 @@ endif()
 find_package(Boost COMPONENTS context fiber )
 
 if(NOT Boost_FOUND)
-  message(FATAL_ERROR "Please provide the path to the root directory of the boost installation using the -DBOOST_ROOT option")
+  message(WARNING "Please provide the path to the root directory of the boost installation using the -DBOOST_ROOT option")
 endif()
 
 # Check for CUDA/ROCm and clang
@@ -157,13 +157,6 @@ if(Boost_FIBER_LIBRARY_DEBUG)
   get_filename_component(Boost_LIBRARY_DIR "${Boost_FIBER_LIBRARY_DEBUG}" DIRECTORY)
 elseif(Boost_FIBER_LIBRARY_RELEASE)
   get_filename_component(Boost_LIBRARY_DIR "${Boost_FIBER_LIBRARY_RELEASE}" DIRECTORY)
-else()
-  get_target_property(FIBER_IMPORT_LIBRARY Boost::fiber IMPORTED_LOCATION_DEBUG)
-  if(NOT FIBER_IMPORT_LIBRARY)
-    get_target_property(FIBER_IMPORT_LIBRARY Boost::fiber IMPORTED_LOCATION_RELEASE)
-  endif()
-  get_filename_component(Boost_LIBRARY_DIR "${FIBER_IMPORT_LIBRARY}" DIRECTORY)
-  get_target_property(Boost_INCLUDE_DIR Boost::fiber INTERFACE_INCLUDE_DIRECTORIES)
 endif()
 
 if(APPLE)
@@ -211,7 +204,7 @@ install(FILES ${HIPSYCL_SOURCE_DIR}/include/SYCL/sycl.hpp DESTINATION include/Ad
 endif()
 
 # TODO-DEV
-set(CLANG_EXECUTABLE_PATH /home/dvalapar/work/xeus/cling-build-static/bin/clang++)
+set(CLANG_EXECUTABLE_PATH ${PROJECT_BINARY_DIR}/bin/clang)
 
 if (CMAKE_VERSION VERSION_LESS 3.17)
    find_package(CUDA QUIET)
@@ -285,28 +278,6 @@ if(WITH_SSCP_COMPILER)
   set(WITH_LLVM_TO_HOST true)
 endif()
 
-add_subdirectory(${HIPSYCL_SOURCE_DIR}/src/compiler)
-add_subdirectory(${HIPSYCL_SOURCE_DIR}/src/libkernel)
-
-set(ACPP_RT_SANITIZE "" CACHE STRING
-    "Enable building AdaptiveCpp runtime with specified sanitizers")
-
-if(NOT ${ACPP_RT_SANITIZE} STREQUAL "")
-  set(ACPP_RT_SANITIZE_FLAGS "-fsanitize=${ACPP_RT_SANITIZE}")
-else()
-  set(ACPP_RT_SANITIZE_FLAGS "")
-endif()
-add_subdirectory(${HIPSYCL_SOURCE_DIR}/src/runtime)
-
-if(WIN32)
-  # We need cmake to support exporting of symbols not only from libraries but
-  # from executables too. This way cling can find symbols from its own
-  # executable during runtime.
-  cmake_minimum_required(VERSION 3.6.2)
-else(WIN32)
-  # support of earlier cmake versions will be removed soon
-  cmake_minimum_required(VERSION 3.5)
-endif(WIN32)
 
 # If we are not building as a part of LLVM, build Cling as an
 # standalone project, using LLVM as an external library:
@@ -545,7 +516,7 @@ if(MSVC)
     endif()
   endif()
 else()
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 endif()
 
 if(MSVC)
@@ -778,6 +749,30 @@ if (TARGET clang-headers)
   list(APPEND LLVM_COMMON_DEPENDS clang-headers)
 endif()
 
+add_subdirectory(${HIPSYCL_SOURCE_DIR}/src/compiler)
+add_subdirectory(${HIPSYCL_SOURCE_DIR}/src/libkernel)
+
+set(ACPP_RT_SANITIZE "" CACHE STRING
+    "Enable building AdaptiveCpp runtime with specified sanitizers")
+
+if(NOT ${ACPP_RT_SANITIZE} STREQUAL "")
+  set(ACPP_RT_SANITIZE_FLAGS "-fsanitize=${ACPP_RT_SANITIZE}")
+else()
+  set(ACPP_RT_SANITIZE_FLAGS "")
+endif()
+add_subdirectory(${HIPSYCL_SOURCE_DIR}/src/runtime)
+
+if(WIN32)
+  # We need cmake to support exporting of symbols not only from libraries but
+  # from executables too. This way cling can find symbols from its own
+  # executable during runtime.
+  cmake_minimum_required(VERSION 3.6.2)
+else(WIN32)
+  # support of earlier cmake versions will be removed soon
+  cmake_minimum_required(VERSION 3.5)
+endif(WIN32)
+
+
 add_subdirectory(include/cling/Interpreter)
 add_subdirectory(lib)
 
@@ -821,4 +816,5 @@ endif()
 set(CLING_ORDER_FILE "" CACHE FILEPATH
   "Order file to use when compiling cling in order to improve startup time.")
 
+  
 add_subdirectory(cmake/modules)
